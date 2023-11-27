@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 function LoginPage() {
   let loggedIn = false;
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loggedInUser, setLoggedinUser] = useState("")
 
   const handleUsernameChange = (e) => setUsername(e.target.value);
   const handlePasswordChange = (e) => setPassword(e.target.value);
@@ -14,9 +15,9 @@ function LoginPage() {
     e.preventDefault();
     try {
       const response = await fetch("http://localhost:3001/users/login", {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': "application/json",
         },
         body: JSON.stringify({ usernames: username, passwords: password }),
       });
@@ -25,10 +26,11 @@ function LoginPage() {
       console.log(responseJson);
       if (responseJson.success) {
         navigate("/calendar");
+        setLoggedinUser(username)
       }
 
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   };
 
