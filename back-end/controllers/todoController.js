@@ -17,6 +17,10 @@ module.exports.findOne = async (id) => {
     return await query("SELECT * FROM todos WHERE id = ?", [id]);
 };
 
+module.exports.findByDate = async (date) => {
+    return await query("SELECT * FROM todos WHERE date = ?", [date]);
+};
+
 module.exports.remove = async (id) => {
     return await query("DELETE FROM todos WHERE id = ?", [id]);
 };

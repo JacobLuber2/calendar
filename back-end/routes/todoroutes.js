@@ -1,8 +1,16 @@
 const express = require("express");
-const { findOne, findAll, addOne, updateCompleted, remove } = require("../controllers/todoController.js");
+const { findOne, findAll, addOne, updateCompleted, remove, findByDate } = require("../controllers/todoController.js");
 const { getUser } = require('../session.js');
 
 const router = express.Router();
+
+router.get('/', async (req, res) => {
+    const date = req.query.date;
+
+    const response = await findByDate(date);
+
+    return res.json(response);
+});
 
 router.get("/:id?", async (req, res, next) => {
     try {
@@ -34,7 +42,7 @@ router.post("/", async (req, res, next) => {
         todoData.userId = user.users_id;
         console.log(todoData);
         let data = await addOne(todoData);
-        res.json(data);
+        res.json(data.insertId);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal Server Error" });

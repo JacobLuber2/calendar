@@ -16,10 +16,14 @@ export default function ToDo() {
          'Content-Type': 'application/json',
        },
        body: JSON.stringify({ description: text, date, isCompleted: isChecked }) 
+      })
+      .then((res) => res.json())
+      .then((response) => {
+        const newList = [...list, { id: response, todos: text, date: date, isCompleted: isChecked }];
+        setList(newList);
+        setText("");
       });
-    const newList = [...list, { description: text, date: date, isCompleted: isChecked }];
-    setList(newList);
-    setText("");
+
   }
   
   useEffect(() => {
@@ -33,8 +37,16 @@ export default function ToDo() {
       });
   }, [date]);
 
+  const deleteTodo = (id) => {
+    fetch(`http://localhost:3001/todos/${id}`, {
+      method: 'DELETE'
+    }).then(() => {
+      const newList = list.filter(todo => todo.id !== id);
+      setList(newList);
+    })
+  };
+
   const handleCheckboxChange = (event) => {
-    setIsChecked(event.target.checked);
     const id = event.target.id;
     const description = event.target.getAttribute('data-description');
     fetch(`http://localhost:3001/todos/${id}`, {
@@ -47,10 +59,13 @@ export default function ToDo() {
       method: 'PUT'
     });
 
-
+    const changedIndex = list.findIndex(item => item.id === parseInt(id));
     const listWithoutChanged = list.filter(item => item.id !== parseInt(id));
 
-    setList([...listWithoutChanged, { id: parseInt(id), isChecked: event.target.checked, todos: description }]);
+    const updatedItem = { id: parseInt(id), isChecked: event.target.checked, todos: description };
+
+    listWithoutChanged.splice(changedIndex, 0, updatedItem);
+    setList(listWithoutChanged);
   };
 
   return (
@@ -71,6 +86,8 @@ export default function ToDo() {
           return (
             <li key={item.todos + idx}>
               <input type="checkbox" id={item.id} data-description={item.todos} checked={item.isCompleted} onChange={handleCheckboxChange}/> {item.todos}
+
+              <button type="button" onClick={() => deleteTodo(item.id)}>Delete</button>
             </li>
           );
         })}
